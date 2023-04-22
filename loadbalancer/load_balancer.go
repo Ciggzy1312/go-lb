@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	RETRY_ATTEMPTED int = 0
+	RETRY_ATTEMPTED int = iota
 )
 
 func AllowRetry(r *http.Request) bool {
@@ -25,12 +25,6 @@ type loadBalancer struct {
 	serverPool serverpool.ServerPool
 }
 
-func NewLoadBalancer(serverPool serverpool.ServerPool) LoadBalancer {
-	return &loadBalancer{
-		serverPool: serverPool,
-	}
-}
-
 func (lb *loadBalancer) Serve(w http.ResponseWriter, r *http.Request) {
 	peer := lb.serverPool.GetNextValidPeer()
 	if peer != nil {
@@ -38,4 +32,10 @@ func (lb *loadBalancer) Serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Error(w, "Service not available", http.StatusServiceUnavailable)
+}
+
+func NewLoadBalancer(serverPool serverpool.ServerPool) LoadBalancer {
+	return &loadBalancer{
+		serverPool: serverPool,
+	}
 }

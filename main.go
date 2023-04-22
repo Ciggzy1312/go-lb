@@ -24,23 +24,19 @@ func main() {
 	defer logger.Sync()
 
 	config, err := utils.GetLBConfig()
-	fmt.Println("Config: ", config)
 	if err != nil {
 		utils.Logger.Fatal(err.Error())
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	fmt.Println("Context: ", ctx)
 
 	serverPool, err := serverpool.NewServerPool(utils.GetLBStrategy(config.Strategy))
-	fmt.Println("Server Pool: ", serverPool)
 	if err != nil {
 		utils.Logger.Fatal(err.Error())
 	}
 
 	loadBalancer := loadbalancer.NewLoadBalancer(serverPool)
-	fmt.Println("Load Balancer: ", loadBalancer)
 
 	for _, u := range config.Backends {
 		endpoint, err := url.Parse(u)
